@@ -1,0 +1,200 @@
+    "- `nameDest`: Customer who is the recipient of the transaction.\n",
+    "- `oldbalanceDest`: Initial balance recipient before the transaction.\n",
+    "- `newbalanceDest`: New balance recipient after the transaction.\n",
+    "\n",
+    "### Target Variable\n",
+    "- `isFraud`: This is the transactions made by the fraudulent agents inside the simulation.\n",
+    "\n",
+    "### Dataset Characteristics\n",
+    "- **Missing Values:** The dataset is clean with no missing values.\n",
+    "- **Categorical vs Numerical:** Features like `type`, `nameOrig`, and `nameDest` are categorical, while `amount` and balance-related fields are numerical.\n",
+    "- **Class Imbalance:** Fraudulent transactions represent a very small fraction of the total data (~0.13%), making this a highly imbalanced classification problem.\n",
+    "\n",
+    "### Suitability\n",
+    "This dataset is ideal for fraud detection as it contains both behavioral patterns (transaction types, timing) and financial state changes (balance differences), which are key indicators of fraudulent activity."
+   ],
+   "id": "77b3d2f1ef14420c"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2026-02-20T05:50:18.714279Z",
+     "start_time": "2026-02-20T05:49:52.371579Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "df = pd.read_csv(\"AIML_Dataset.csv\")",
+--
+       "1     1   PAYMENT   1864.28  C1666544295        21249.0        19384.72   \n",
+       "2     1  TRANSFER    181.00  C1305486145          181.0            0.00   \n",
+       "3     1  CASH_OUT    181.00   C840083671          181.0            0.00   \n",
+       "4     1   PAYMENT  11668.14  C2048537720        41554.0        29885.86   \n",
+       "\n",
+       "      nameDest  oldbalanceDest  newbalanceDest  isFraud  isFlaggedFraud  \n",
+       "0  M1979787155             0.0             0.0        0               0  \n",
+       "1  M2044282225             0.0             0.0        0               0  \n",
+       "2   C553264065             0.0             0.0        1               0  \n",
+       "3    C38997010         21182.0             0.0        1               0  \n",
+       "4  M1230701703             0.0             0.0        0               0  "
+      ],
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+--
+       "      <th>oldbalanceOrg</th>\n",
+       "      <th>newbalanceOrig</th>\n",
+       "      <th>nameDest</th>\n",
+       "      <th>oldbalanceDest</th>\n",
+       "      <th>newbalanceDest</th>\n",
+       "      <th>isFraud</th>\n",
+       "      <th>isFlaggedFraud</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>PAYMENT</td>\n",
+       "      <td>9839.64</td>\n",
+       "      <td>C1231006815</td>\n",
+       "      <td>170136.0</td>\n",
+       "      <td>160296.36</td>\n",
+       "      <td>M1979787155</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+--
+      " 4   oldbalanceOrg   float64\n",
+      " 5   newbalanceOrig  float64\n",
+      " 6   nameDest        str    \n",
+      " 7   oldbalanceDest  float64\n",
+      " 8   newbalanceDest  float64\n",
+      " 9   isFraud         int64  \n",
+      " 10  isFlaggedFraud  int64  \n",
+      "dtypes: float64(5), int64(3), str(3)\n",
+      "memory usage: 534.0 MB\n"
+     ]
+    }
+   ],
+   "execution_count": 9
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2026-02-20T05:51:23.866995Z",
+     "start_time": "2026-02-20T05:51:23.703344Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "df.columns",
+   "id": "ea1e31d23360307",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "Index(['step', 'type', 'amount', 'nameOrig', 'oldbalanceOrg', 'newbalanceOrig',\n",
+       "       'nameDest', 'oldbalanceDest', 'newbalanceDest', 'isFraud',\n",
+       "       'isFlaggedFraud'],\n",
+       "      dtype='str')"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 10
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "### Dataset Summary\n",
+    "The initial inspection of the dataset shows it consists of over 1 million records with 11 columns, including both numerical (amounts, balances) and categorical data (transaction types, user IDs). There are no missing values to address."
+   ],
+   "id": "4d701a7cc706834c"
+  },
+  {
+   "metadata": {},
+   "cell_type": "markdown",
+   "source": [
+    "### Class Distribution\n",
+    "Checking the balance of the target variable `isFraud`. Understanding the extent of class imbalance is crucial for selecting the right evaluation metrics and modeling strategy.\n"
+   ],
+   "id": "a47007fde4900126"
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2026-02-20T05:53:50.083140Z",
+     "start_time": "2026-02-20T05:53:49.522298Z"
+    }
+   },
+   "cell_type": "code",
+   "source": "df[\"isFraud\"].value_counts()",
+   "id": "6f92d4b562799a51",
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "isFraud\n",
+       "0    6354407\n",
+       "1       8213\n",
+       "Name: count, dtype: int64"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 11
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2026-02-20T05:53:59.256517Z",
+     "start_time": "2026-02-20T05:53:58.888359Z"
+    }
+   },
+   "cell_type": "code",
+--
+       "oldbalanceOrg     0\n",
+       "newbalanceOrig    0\n",
+       "nameDest          0\n",
+       "oldbalanceDest    0\n",
+       "newbalanceDest    0\n",
+       "isFraud           0\n",
+       "isFlaggedFraud    0\n",
+       "dtype: int64"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "execution_count": 13
+  },
+  {
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2026-02-20T05:54:35.450900Z",
+     "start_time": "2026-02-20T05:54:35.231599Z"
+    }
+   },
