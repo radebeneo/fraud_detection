@@ -26,9 +26,9 @@ To avoid modifying the System Python, this project uses a virtual environment fo
    ```
 
 ### Running the Application
-This project includes a Streamlit application for making real-time predictions.
+This project includes a Streamlit application for making real-time predictions. You can also access the [Live Demo](https://fraud-detection-v1.streamlit.app/).
 
-1. Run the Streamlit app:
+1. Run the Streamlit app locally:
    ```bash
    streamlit run fraud_detection.py
    ```
